@@ -1,0 +1,113 @@
+/* ================================================================
+   FLOWBOARD — Global Styles
+   WHY THIS FILE EXISTS:
+   CSS custom properties (design tokens) defined here cascade to
+   every component, giving us a single source of truth for colours,
+   spacing, and typography. Component SCSS files only reference
+   these variables — never hardcoded hex values.
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  /* Palette */
+  --bg:             #0a0a0a;
+  --bg2:            #111111;
+  --bg3:            #1a1a1a;
+  --surface:        #161616;
+  --surface2:       #1e1e1e;
+  --border:         rgba(255, 255, 255, 0.08);
+  --border-hover:   rgba(255, 255, 255, 0.18);
+  --accent:         #c8f55a;
+  --accent-dim:     rgba(200, 245, 90, 0.1);
+  --accent-border:  rgba(200, 245, 90, 0.25);
+  --danger:         #ff5f57;
+  --warning:        #ffbd2e;
+  --success:        #28c840;
+
+  /* Text */
+  --text:           #f0f0ee;
+  --muted:          #888884;
+  --muted2:         #555552;
+
+  /* Typography */
+  --font-display:   'Syne', sans-serif;
+  --font-body:      'DM Sans', sans-serif;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radii */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  18px;
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.4);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.5);
+  --shadow-lg:  0 20px 48px rgba(0,0,0,0.6);
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: var(--font-body); }
+input, textarea { font-family: var(--font-body); }
+
+/* Utility: visually hidden (accessibility) */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+
+/* Angular CDK drag preview global override */
+.cdk-drag-preview {
+  box-shadow: var(--shadow-lg) !important;
+  opacity: 0.9;
+}
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}

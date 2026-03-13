@@ -1,0 +1,40 @@
+{
+  "rules": {
+    "boards": {
+      "$boardId": {
+        ".read":  "auth != null && data.child('memberIds').child(auth.uid).exists()",
+        ".write": "auth != null && (
+          !data.exists() ||
+          data.child('ownerId').val() === auth.uid ||
+          data.child('memberIds').child(auth.uid).exists()
+        )"
+      }
+    },
+    "columns": {
+      "$boardId": {
+        ".read":  "auth != null && root.child('boards').child($boardId).child('memberIds').child(auth.uid).exists()",
+        ".write": "auth != null && root.child('boards').child($boardId).child('memberIds').child(auth.uid).exists()"
+      }
+    },
+    "cards": {
+      "$boardId": {
+        ".read":  "auth != null && root.child('boards').child($boardId).child('memberIds').child(auth.uid).exists()",
+        ".write": "auth != null && root.child('boards').child($boardId).child('memberIds').child(auth.uid).exists()"
+      }
+    },
+    "presence": {
+      "$boardId": {
+        ".read":  "auth != null && root.child('boards').child($boardId).child('memberIds').child(auth.uid).exists()",
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      }
+    },
+    "users": {
+      "$uid": {
+        ".read":  "auth != null",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    }
+  }
+}
