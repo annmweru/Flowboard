@@ -3,4 +3,4 @@ dist/
 .angular/
 .env
 *.env.local
-environment.ts
+environment.tssrc/environments/environment.ts
