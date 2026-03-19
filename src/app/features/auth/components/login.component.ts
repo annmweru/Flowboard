@@ -1,12 +1,3 @@
-// ================================================================
-// WHY THIS FILE EXISTS (Login Component):
-// Handles sign-in form. Uses Angular's Reactive Forms (not
-// template-driven) because:
-// 1. Validation logic stays in TypeScript, not the template
-// 2. Easier to unit test
-// 3. Better for complex multi-step forms later
-// ================================================================
-
 import { Component, inject }          from '@angular/core';
 import { CommonModule }               from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';

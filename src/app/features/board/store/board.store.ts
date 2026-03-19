@@ -206,9 +206,6 @@ export const selectActiveBoard = createSelector(
   (s, id) => id ? s.boards.entities[id] ?? null : null
 );
 
-// WHY ORDERED COLUMNS: Firebase returns columns in insertion order,
-// but the board.columnOrder array defines the DISPLAY order.
-// This selector merges them correctly.
 export const selectOrderedColumns = createSelector(
   selectActiveBoard, selectColumns,
   (board, cols) => {
@@ -219,7 +216,6 @@ export const selectOrderedColumns = createSelector(
   }
 );
 
-// Cards grouped by columnId — O(1) lookup in template
 export const selectCardsByColumn = createSelector(
   selectCards,
   cards => {
@@ -233,7 +229,6 @@ export const selectCardsByColumn = createSelector(
   }
 );
 
-// ── Effects ────────────────────────────────────────────────
 @Injectable()
 export class BoardEffects {
   private actions$ = inject(Actions);
@@ -246,7 +241,6 @@ export class BoardEffects {
       withLatestFrom(this.store.select(selectUser)),
       switchMap(([_, user]) => {
         if (!user) return of(BoardActions.boardsLoaded({ boards: [] }));
-        // switchMap cancels previous subscription when loadBoards fires again
         return this.fb.watchBoards(user.uid).pipe(
           map(boards => BoardActions.boardsLoaded({ boards })),
           catchError(err => of(BoardActions.error({ error: err.message })))
@@ -351,8 +345,6 @@ openBoard$ = createEffect(() =>
     { dispatch: false }
   );
 
-  // DRAG COMMIT: After the optimistic UI update, write to Firebase.
-  // If Firebase rejects the write, dispatch moveCardRevert.
   moveCardCommit$ = createEffect(() =>
     this.actions$.pipe(
       ofType(BoardActions.moveCardCommit),
@@ -365,8 +357,6 @@ openBoard$ = createEffect(() =>
         const fromCol = columns.find((c: Column) => c.id === drag.fromColumnId);
         const toCol   = columns.find((c: Column) => c.id === drag.toColumnId);
         if (!fromCol || !toCol) return EMPTY;
-        // Note: columns in store are already updated (optimistic).
-        // We need to pass the CURRENT (already-updated) orders to Firebase.
         return this.fb.moveCard(boardId, drag, fromCol.cardOrder, toCol.cardOrder)
           .then(() => null)
           .catch(err => {

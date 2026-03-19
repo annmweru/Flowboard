@@ -1,15 +1,3 @@
-// ================================================================
-// WHY THIS FILE EXISTS (Column Component):
-// A single column (e.g. "In Progress"). It's a CDK drop list —
-// it can RECEIVE dragged cards from other columns.
-//
-// KEY CONCEPT — cdkDropList and connectedTo:
-// Each column is a CdkDropList. They are "connected" to each other
-// via [cdkDropListConnectedTo]. When you drag a card over a connected
-// list, CDK shows a valid drop target and fires cdkDropListDropped.
-// The board component passes ALL column IDs as connected targets.
-// ================================================================
-
 import { Component, Input, Output, EventEmitter,
          ChangeDetectionStrategy }  from '@angular/core';
 import { CommonModule }             from '@angular/common';
@@ -41,11 +29,6 @@ import { Column, Card, DragResult } from '../../../core/models';
         </div>
       </div>
 
-      <!-- Card list — THIS IS THE DROP ZONE -->
-      <!-- cdkDropList: marks this div as a valid drop target
-           cdkDropListData: the data payload that CdkDragDrop receives
-           cdkDropListConnectedTo: OTHER columns this list accepts drops from
-           (cdkDropListDropped): fires when a card is dropped here -->
       <div
         class="card-list"
         cdkDropList
@@ -139,7 +122,6 @@ import { Column, Card, DragResult } from '../../../core/models';
     }
     .icon-btn:hover { background: var(--bg3); color: var(--danger); }
 
-    /* Card list / drop zone */
     .card-list {
       flex: 1;
       overflow-y: auto;
@@ -147,7 +129,6 @@ import { Column, Card, DragResult } from '../../../core/models';
       display: flex;
       flex-direction: column;
       gap: 6px;
-      /* min-height ensures an empty column is still a valid drop target */
       min-height: 80px;
       transition: background 0.2s;
     }
@@ -221,7 +202,7 @@ export class ColumnComponent {
   addingCard    = false;
   newCardTitle  = '';
   isDragOver    = false;
-  
+
   get orderedCards(): Card[] {
         if (!this.column?.cardOrder || !this.cards) return [];
 

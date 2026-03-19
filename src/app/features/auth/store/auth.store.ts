@@ -1,15 +1,3 @@
-// ================================================================
-// WHY THIS FILE EXISTS (Auth Store):
-// NgRx is a state management library based on Redux. Instead of
-// keeping auth state in a component (which disappears when the
-// component does), we keep it in a global store. Any component
-// can SELECT the current user without prop drilling.
-//
-// FLOW: Component dispatches Action → Effect calls Firebase →
-//       Effect dispatches Success/Failure Action → Reducer updates
-//       State → Selectors project State → Components re-render
-// ================================================================
-
 import { createAction, props, createReducer, on,
          createSelector, createFeatureSelector,
          } from '@ngrx/store';
@@ -34,9 +22,6 @@ const initialState: AuthState = {
   error:   null,
 };
 
-// ── Actions ────────────────────────────────────────────────
-// WHY TYPED ACTIONS: If you misspell an action string, TypeScript
-// catches it at compile time instead of runtime.
 export const AuthActions = {
   signIn:          createAction('[Auth] Sign In',         props<{ email: string; password: string }>()),
   signInSuccess:   createAction('[Auth] Sign In Success', props<{ user: User }>()),
