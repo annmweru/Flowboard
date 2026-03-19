@@ -1,13 +1,3 @@
-// ================================================================
-// WHY THIS FILE EXISTS:
-// ALL Firebase calls are centralised in this one service.
-// Components and NgRx Effects never talk to Firebase directly —
-// they go through here. This means:
-//   1. Easy to swap Firebase for a different backend later
-//   2. Easy to mock in unit tests
-//   3. One place to add error handling, retries, logging
-// This separation is a senior-level architectural decision.
-// ================================================================
 
 import { Injectable, inject, OnDestroy } from '@angular/core';
 import { Database, ref, set, push, update, remove,
@@ -21,7 +11,6 @@ import { takeUntil } from 'rxjs/operators';
 import { Board, Column, Card, User, Presence, DragResult } from '../models';
 import { environment } from '../../../environments/environment';
 
-// Colour palette — each connected user gets a unique colour
 const PRESENCE_COLORS = [
   '#c8f55a', '#7ec8f0', '#ffb080', '#c8a0ff',
   '#ff8fa3', '#80ffcc', '#ffd858', '#ff9580'
@@ -34,11 +23,6 @@ export class FirebaseService implements OnDestroy {
   private auth  = inject(Auth);
   private destroy$ = new Subject<void>();
 
-  // ── Auth ───────────────────────────────────────────────────
-
-  // WHY OBSERVABLE: Auth state can change at any time (session
-  // expiry, sign-out in another tab). We stream it so every
-  // component that cares gets updated automatically.
   get authState$(): Observable<User | null> {
     return new Observable(observer => {
       const unsub = onAuthStateChanged(this.auth, fireUser => {
@@ -51,7 +35,7 @@ export class FirebaseService implements OnDestroy {
           createdAt:   Date.now(),
         });
       });
-      return unsub; // cleanup fn — unsubscribes when observable completes
+      return unsub; 
     });
   }
 
@@ -71,11 +55,6 @@ export class FirebaseService implements OnDestroy {
 
   get currentUser() { return this.auth.currentUser; }
 
-  // ── Boards ─────────────────────────────────────────────────
-
-  // WHY watchBoards INSTEAD OF getBoards:
-  // We want LIVE updates. If another user creates a board and
-  // adds you as a member, your list should update without refresh.
   watchBoards(userId: string): Observable<Board[]> {
     return new Observable(observer => {
       const boardsRef = ref(this.db, 'boards');
@@ -107,10 +86,6 @@ export class FirebaseService implements OnDestroy {
     const newRef    = push(boardsRef);
     const boardId   = newRef.key!;
 
-    // Create default columns alongside the board in one batch write.
-    // WHY BATCH: If the board write succeeds but column write fails,
-    // we'd have a board with no columns — a broken state. Batching
-    // makes it atomic (all-or-nothing).
     const todoId    = this.newKey('columns/' + boardId);
     const doingId   = this.newKey('columns/' + boardId);
     const doneId    = this.newKey('columns/' + boardId);
@@ -218,22 +193,16 @@ updates[`columns/${boardId}/${columnId}/cardOrder`] = [...(cardOrder ?? []), car
   }
 
   // ── Drag & Drop ────────────────────────────────────────────
-  // WHY ITS OWN METHOD:
-  // A drag can move a card within the same column (reorder)
-  // OR move it to a different column. Both cases require updating
-  // TWO cardOrder arrays atomically. This method handles both.
   async moveCard(boardId: string, drag: DragResult,
                  fromOrder: string[], toOrder: string[]): Promise<void> {
     const sameColumn = drag.fromColumnId === drag.toColumnId;
 
-    // Build the new order arrays
     const newFrom = [...fromOrder];
-    newFrom.splice(drag.fromIndex, 1); // remove from old position
-
+    newFrom.splice(drag.fromIndex, 1); 
     let newTo: string[];
     if (sameColumn) {
       newTo = [...newFrom];
-      newTo.splice(drag.toIndex, 0, drag.cardId); // insert at new position
+      newTo.splice(drag.toIndex, 0, drag.cardId); 
     } else {
       newTo = [...toOrder];
       newTo.splice(drag.toIndex, 0, drag.cardId);
@@ -251,17 +220,11 @@ updates[`columns/${boardId}/${columnId}/cardOrder`] = [...(cardOrder ?? []), car
       updates[`cards/${boardId}/${drag.cardId}/updatedAt`]        = Date.now();
     }
 
-    // OPTIMISTIC UPDATE: we already updated the UI before this call.
-    // Firebase will confirm or reject. If rejected, NgRx will revert.
+
     await update(ref(this.db), updates);
   }
 
   // ── Presence ───────────────────────────────────────────────
-  // WHY THIS IS THE COOLEST PART:
-  // onDisconnect() tells Firebase: "when this client disconnects
-  // (even if the browser crashes), DELETE this presence record."
-  // Firebase executes that deletion server-side automatically.
-  // This is how we get real-time "who's online" without polling.
   async joinBoard(boardId: string, user: User): Promise<void> {
     const color = PRESENCE_COLORS[Math.floor(Math.random() * PRESENCE_COLORS.length)];
     const presRef = ref(this.db, `presence/${boardId}/${user.uid}`);
@@ -273,7 +236,6 @@ updates[`columns/${boardId}/${columnId}/cardOrder`] = [...(cardOrder ?? []), car
       lastSeen: Date.now()
     };
     await set(presRef, presence);
-    // This is the magic — Firebase removes this when user disconnects
     await onDisconnect(presRef).remove();
   }
 
