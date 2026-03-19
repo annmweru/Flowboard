@@ -4,3 +4,4 @@ dist/
 .env
 *.env.local
 environment.tssrc/environments/environment.ts
+src/environments/environment.ts
